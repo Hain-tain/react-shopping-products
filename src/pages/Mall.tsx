@@ -4,15 +4,16 @@ import { SORT, SORT_LIST } from "../constants/sort";
 import Dropdown from "../components/Dropdown";
 import { Global } from "@emotion/react";
 import Header from "../components/Header";
-import InfiniteScrollComponent from "../components/InfiniteProductsScrollComponent";
+import InfiniteScrollComponent from "../components/InfiniteScrollComponent";
 import MainTitle from "../components/MainTitle";
+import ProductCard from "../components/product/ProductCard";
 import { ToastContext } from "../components/Toasts/ToastProvider";
 import { baseStyle } from "../style/baseStyle";
 import styled from "@emotion/styled";
 import useCustomContext from "../hooks/useCustomContext";
 import { useEffect } from "react";
+import useManageCartItem from "../hooks/useManageCartItem";
 import useProducts from "../hooks/useProducts";
-import useToggleCartItem from "../hooks/useToggleCartItem";
 
 const S = {
   MainMall: styled.div`
@@ -45,12 +46,12 @@ const Mall = () => {
 
   const {
     cartItems,
-    addToCart,
-    removeFromCart,
-    checkSelected,
+    addItemToCart,
+    removeItemFromCart,
+    isItemInCart,
     isLoading: isToggleCartItemLoading,
     error: toggleCartItemError,
-  } = useToggleCartItem();
+  } = useManageCartItem();
 
   const { failAlert } = useCustomContext(ToastContext);
 
@@ -86,19 +87,23 @@ const Mall = () => {
         </S.Toolbar>
         <S.ProductList>
           <InfiniteScrollComponent
-            handleCartItems={{
-              addToCart,
-              checkSelected,
-              removeFromCart,
-              isLoading: isToggleCartItemLoading,
-            }}
-            productObject={{
-              products,
-              isLoading: isProductLoading,
-              error: productError,
-              fetchNextPage,
-            }}
-          />
+            isLoading={isProductLoading}
+            error={productError}
+            fetchNextPage={fetchNextPage}
+          >
+            {products.map((product, index) => (
+              <ProductCard
+                key={`${index}${product.id}`}
+                product={product}
+                cartManager={{
+                  addItemToCart,
+                  removeItemFromCart,
+                  isItemInCart,
+                  isLoading: isToggleCartItemLoading,
+                }}
+              />
+            ))}
+          </InfiniteScrollComponent>
         </S.ProductList>
       </S.MainMall>
     </>

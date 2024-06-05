@@ -1,8 +1,8 @@
 import { CATEGORY_LIST, Category } from "../constants/category";
-import { SORT_LIST, Sort } from "../constants/sort";
 
 import { ERROR_MESSAGE } from "../constants/message";
 import { PRODUCTS_ENDPOINT } from "./endPoint";
+import { Sort } from "../constants/sort";
 import { fetchWithToken } from "./fetchWithToken";
 
 interface GetProductsParams {
@@ -18,13 +18,18 @@ export async function getProducts({
   category,
   sort,
 }: GetProductsParams) {
-  let url = `${PRODUCTS_ENDPOINT}?page=${page}&size=${size}`;
+  const params = new URLSearchParams();
+  params.append("page", encodeURIComponent(page));
+  params.append("size", encodeURIComponent(size));
+
   if (category !== CATEGORY_LIST[0]) {
-    url += `&category=${encodeURIComponent(category)}`;
+    params.append("category", encodeURIComponent(category));
   }
-  if (sort !== SORT_LIST[0]) {
-    url += `&sort=price%2C${encodeURIComponent(sort)}`;
-  }
+
+  params.append("sort", `price,${encodeURIComponent(sort)}`);
+  params.append("sort", "id,asc");
+
+  const url = `${PRODUCTS_ENDPOINT}?${params.toString()}`;
 
   const data = await fetchWithToken({
     url,

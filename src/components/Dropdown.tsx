@@ -54,14 +54,17 @@ function Dropdown<T extends string>({
   engToKor,
   handleChange,
 }: DropdownProps<T>) {
+  if (!options.length || Object.keys(engToKor).length !== options.length) {
+    throw Error("options가 없거나 engToKor 객체가 올바르지 않습니다.");
+  }
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState<T>(options[0]);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => setIsOpen((isOpen) => !isOpen);
 
   const handleSelect = (option: T) => {
     setSelectedLabel(option);
-    setIsOpen(false);
 
     handleChange(option);
   };

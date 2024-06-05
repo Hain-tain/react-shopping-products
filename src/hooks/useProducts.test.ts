@@ -1,3 +1,11 @@
+import {
+  FIRST_PAGE,
+  GAP_WITH_FIRST_PAGE,
+  MOCK_PRODUCTS_LAST_PAGE,
+  MOCK_PRODUCTS_TOTAL_SIZE,
+  SIZE_OF_FIRST_PAGE,
+  SIZE_PER_PAGE,
+} from "../constants/pagination";
 import { HttpResponse, http } from "msw";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -12,7 +20,7 @@ describe("useProduct 훅 테스트", () => {
       const { result } = renderHook(() => useProducts());
 
       await waitFor(() => {
-        expect(result.current.products).toHaveLength(20);
+        expect(result.current.products).toHaveLength(SIZE_OF_FIRST_PAGE);
       });
     });
 
@@ -50,8 +58,8 @@ describe("useProduct 훅 테스트", () => {
       const { result } = renderHook(() => useProducts());
 
       await waitFor(() => {
-        expect(result.current.products).toHaveLength(20);
-        expect(result.current.page).toBe(0);
+        expect(result.current.products).toHaveLength(SIZE_OF_FIRST_PAGE);
+        expect(result.current.page).toBe(FIRST_PAGE);
       });
     });
 
@@ -59,8 +67,8 @@ describe("useProduct 훅 테스트", () => {
       const { result } = renderHook(() => useProducts());
 
       await waitFor(() => {
-        expect(result.current.products).toHaveLength(20);
-        expect(result.current.page).toBe(0);
+        expect(result.current.products).toHaveLength(SIZE_OF_FIRST_PAGE);
+        expect(result.current.page).toBe(FIRST_PAGE);
       });
 
       act(() => {
@@ -68,8 +76,10 @@ describe("useProduct 훅 테스트", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.products.length).toBe(24);
-        expect(result.current.page).toBe(5);
+        expect(result.current.products.length).toBe(
+          SIZE_OF_FIRST_PAGE + SIZE_PER_PAGE
+        );
+        expect(result.current.page).toBe(FIRST_PAGE + GAP_WITH_FIRST_PAGE);
       });
     });
 
@@ -90,19 +100,24 @@ describe("useProduct 훅 테스트", () => {
     it("마지막 페이지인 경우 데이터를 불러오지 않는다.", async () => {
       const { result } = renderHook(() => useProducts());
 
-      const expectedInitProductsCount = 20;
+      const expectedInitProductsCount = SIZE_OF_FIRST_PAGE;
 
       await waitFor(() => {
         expect(result.current.products).toHaveLength(expectedInitProductsCount);
       });
 
-      for (let page = 5; page < 25; page += 1) {
+      for (
+        let page = FIRST_PAGE + GAP_WITH_FIRST_PAGE;
+        page <= MOCK_PRODUCTS_LAST_PAGE;
+        page += 1
+      ) {
         act(() => {
           result.current.fetchNextPage();
         });
 
         const expectedProductsCount =
-          expectedInitProductsCount + (page - 4) * 4;
+          expectedInitProductsCount +
+          (page - GAP_WITH_FIRST_PAGE) * SIZE_PER_PAGE;
 
         await waitFor(() => {
           expect(result.current.page).toBe(page);
@@ -115,8 +130,8 @@ describe("useProduct 훅 테스트", () => {
       });
 
       await waitFor(() => {
-        expect(result.current.page).toBe(24);
-        expect(result.current.products).toHaveLength(100);
+        expect(result.current.page).toBe(MOCK_PRODUCTS_LAST_PAGE);
+        expect(result.current.products).toHaveLength(MOCK_PRODUCTS_TOTAL_SIZE);
       });
     });
   });

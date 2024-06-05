@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import AddToCart from "../icons/AddToCart";
 import COLOR_PALETTE from "../../style/colorPalette";
+import { CartManager } from "../../hooks/useManageCartItem";
 import DeleteFromCart from "../icons/DeleteFromCart";
-import { HandleCartItems } from "../../hooks/useToggleCartItem";
 import LoadingDots from "../LoadingDots";
 import styled from "@emotion/styled";
 
@@ -34,17 +34,17 @@ const S = {
 
 interface ToggleItemButtonProps {
   id: number;
-  handleCartItems: HandleCartItems;
+  cartManager: CartManager;
 }
 
-const ToggleItemButton = ({ id, handleCartItems }: ToggleItemButtonProps) => {
-  const { addToCart, removeFromCart, checkSelected } = handleCartItems;
+const ToggleItemButton = ({ id, cartManager }: ToggleItemButtonProps) => {
+  const { addItemToCart, removeItemFromCart, isItemInCart } = cartManager;
   const [isLoading, setIsLoading] = useState(false);
-  const [isSelected, setSelected] = useState(checkSelected(id));
+  const [isSelected, setSelected] = useState(isItemInCart(id));
 
   useEffect(() => {
-    setSelected(checkSelected(id));
-  }, [checkSelected, id]);
+    setSelected(isItemInCart(id));
+  }, [isItemInCart, id]);
 
   const handleClick = async () => {
     if (isLoading) return;
@@ -54,10 +54,10 @@ const ToggleItemButton = ({ id, handleCartItems }: ToggleItemButtonProps) => {
       setSelected((prev) => !prev);
 
       if (isSelected) {
-        await removeFromCart(id);
+        await removeItemFromCart(id);
       }
       if (!isSelected) {
-        await addToCart(id);
+        await addItemToCart(id);
       }
     } catch (error) {
       setSelected((prev) => !prev);

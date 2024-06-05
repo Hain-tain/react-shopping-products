@@ -1,4 +1,4 @@
-import { HandleCartItems } from "../../hooks/useToggleCartItem";
+import { CartManager } from "../../hooks/useManageCartItem";
 import { Product } from "../../types/products";
 import { PropsWithChildren } from "react";
 import ToggleItemButton from "./ToggleItemButton";
@@ -37,17 +37,17 @@ const S = {
 
 interface ProductCardProps extends PropsWithChildren {
   product: Product;
-  handleCartItems: HandleCartItems;
+  cartManager: CartManager;
 }
 
-const ProductCard = ({ product, handleCartItems }: ProductCardProps) => {
+const ProductCard = ({ product, cartManager }: ProductCardProps) => {
   return (
     <S.ProductCard>
       <S.ProductImage src={product.imageUrl} alt={product.name} />
       <S.ProductInfo>
         <S.ProductName>{product.name}</S.ProductName>
-        <S.Price>{`${product.price.toLocaleString()}원`}</S.Price>
-        <ToggleItemButton id={product.id} handleCartItems={handleCartItems} />
+        <S.Price>{`${product.price.toLocaleString("ko-KR")}원`}</S.Price>
+        <ToggleItemButton id={product.id} cartManager={cartManager} />
       </S.ProductInfo>
     </S.ProductCard>
   );
