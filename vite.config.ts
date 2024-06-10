@@ -8,4 +8,8 @@ export default defineConfig({
       jsxImportSource: "@emotion/react",
     }),
   ],
+  base:
+    process.env.NODE_ENV === "production"
+      ? "/react-shopping-products/dist"
+      : "/",
 });
